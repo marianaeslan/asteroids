@@ -24,6 +24,7 @@ def main():
         pygame.Surface.fill(screen, (0,0,0))
         player.draw(screen)
         dt = game_clock.tick(60) / 1000
+        player.update(dt)
         pygame.display.update()
         
     pygame.quit()
