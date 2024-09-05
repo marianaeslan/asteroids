@@ -15,7 +15,7 @@ def main():
     drawable = pygame.sprite.Group()
     Player.containers = (updatable, drawable)
 
-    player = Player(x=SCREEN_WIDTH/2, y=SCREEN_HEIGHT/2)
+    player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
     dt = 0
 
     running = True
@@ -28,7 +28,7 @@ def main():
         for obj in updatable:
             obj.update(dt)
 
-        pygame.Surface.fill(screen, (0,0,0))
+        screen.fill("black")
 
         for obj in drawable:
             obj.draw(screen)
