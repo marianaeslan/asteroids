@@ -5,10 +5,21 @@ from circleshape import CircleShape
 
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
-       super().__init__(x, y, radius)
+        super().__init__(x, y, radius)
+        # Load and scale the asteroid image
+        self.image = pygame.image.load("asteroid.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))  # Scale based on radius
+        
+        # Create a rotated version of the image to match the asteroid's movement
+        self.angle = random.uniform(0, 360)
+        self.image = pygame.transform.rotate(self.image, self.angle)
+        
+        self.rect = self.image.get_rect(center=(self.position.x, self.position.y))
+
     
     def draw(self, screen):
-        pygame.draw.circle(screen, "white", self.position, self.radius, 2)
+        screen.blit(self.image, self.rect)
+        self.rect.center = self.position
 
     def update(self, dt):
         self.position += self.velocity * dt

@@ -10,6 +10,7 @@ from shot import Shot
 def main():
     pygame.init()
     print("Starting asteroids!")
+    score = 0  # New score variable
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     game_clock = pygame.time.Clock()
@@ -29,6 +30,7 @@ def main():
     asteroid_field = AsteroidField()
 
     player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+    font = pygame.font.Font(None, 36)  # Load a font for displaying the score
     dt = 0
 
     running = True
@@ -47,19 +49,36 @@ def main():
         # Clear screen
         screen.fill("black")
 
-        # Check for collisions between player and asteroids
+        # Check collision between player and asteroid
         for asteroid in asteroids:
             if player.check_collision(asteroid):
-                print("Game over!")
-                exit() 
+                player.lives -= 1  # Decrease life by 1
+                if player.lives <= 0:
+                    print("Game Over!")
+                    running = False
+                    exit()
+                asteroid.kill()  # Destroy the asteroid
+                break
 
         for asteroid in asteroids:
             for shot in shots:
                 if shot.check_collision(asteroid):
                     asteroid.split()
+                    shot.kill()
+                    asteroid.kill()
+                    score += 100
+
         # Draw all objects in the 'drawable' group
         for obj in drawable:
             obj.draw(screen)
+
+        score_text = font.render(f"Score: {score}", True, (255, 255, 255))  # White color
+        screen.blit(score_text, (10, 10))  # Display at the top-left corner
+
+        # Draw the lives on the screen
+        lives_text = font.render(f'Lives: {player.lives}', True, (255, 255, 255))
+        lives_rect = lives_text.get_rect(topright=(SCREEN_WIDTH - 10, 10))  # Position lives text at top-right corner
+        screen.blit(lives_text, lives_rect)         
 
         pygame.display.flip()
         

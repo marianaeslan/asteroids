@@ -8,6 +8,12 @@ class Player(CircleShape):
         super().__init__(x,y,PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_timer = 0
+        self.lives = 3
+
+        # Load and scale the image for the player (spaceship image)
+        self.original_image = pygame.image.load("spaceship.png").convert_alpha()
+        self.original_image = pygame.transform.scale(self.original_image, (PLAYER_RADIUS * 4, PLAYER_RADIUS * 4))
+        self.image = self.original_image  # This will hold the rotated image
 
     # in the player class
     def triangle(self):
@@ -19,7 +25,14 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self,screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), width=2)
+       # Rotate the image based on the player's rotation
+        rotated_image = pygame.transform.rotate(self.original_image, -self.rotation)
+
+        # Get the rect for positioning and center it at the player's position
+        rect = rotated_image.get_rect(center=(self.position.x, self.position.y))
+
+        # Blit the rotated image to the screen
+        screen.blit(rotated_image, rect.topleft)
     
     def rotate(self,dt):
         self.rotation += PLAYER_TURN_SPEED * dt
