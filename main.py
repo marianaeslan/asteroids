@@ -54,7 +54,11 @@ def main():
             if player.check_collision(asteroid):
                 player.lives -= 1  # Decrease life by 1
                 if player.lives <= 0:
-                    print("Game Over!")
+                    game_over_text = font.render("Game Over", True, (255, 0, 0))  # Red color
+                    text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+                    screen.blit(game_over_text, text_rect)  # Draw the text
+                    pygame.display.flip()  # Update the display
+                    pygame.time.wait(2000)  # Wait for 2 seconds
                     running = False
                     exit()
                 asteroid.kill()  # Destroy the asteroid
