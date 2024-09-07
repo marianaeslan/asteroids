@@ -11,6 +11,9 @@ def main():
     pygame.init()
     print("Starting asteroids!")
     score = 0  # New score variable
+    game_over = False  # To track if the game is over
+    game_over_timer = 0  # To control how long the "Game Over" screen is displayed
+
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     game_clock = pygame.time.Clock()
@@ -42,47 +45,56 @@ def main():
 
         dt = game_clock.tick(60) / 1000
 
-        # Update all objects in the 'updatable' group
-        for obj in updatable:
-            obj.update(dt)
+        if not game_over:
+            # Update all objects in the 'updatable' group
+            for obj in updatable:
+                obj.update(dt)
 
-        # Clear screen
-        screen.fill("black")
+            # Clear screen
+            screen.fill("black")
 
-        # Check collision between player and asteroid
-        for asteroid in asteroids:
-            if player.check_collision(asteroid):
-                player.lives -= 1  # Decrease life by 1
-                if player.lives <= 0:
-                    game_over_text = font.render("Game Over", True, (255, 0, 0))  # Red color
-                    text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-                    screen.blit(game_over_text, text_rect)  # Draw the text
-                    pygame.display.flip()  # Update the display
-                    pygame.time.wait(2000)  # Wait for 2 seconds
-                    running = False
-                    exit()
-                asteroid.kill()  # Destroy the asteroid
-                break
+            # Check collision between player and asteroid
+            for asteroid in asteroids:
+                if player.check_collision(asteroid):
+                    player.lives -= 1  # Decrease life by 1
+                    if player.lives <= 0:
+                        game_over = True  # Trigger game over state
+                        game_over_timer = pygame.time.get_ticks()  # Start timer
+                    asteroid.kill()  # Destroy the asteroid
+                    break
 
-        for asteroid in asteroids:
-            for shot in shots:
-                if shot.check_collision(asteroid):
-                    asteroid.split()
-                    shot.kill()
-                    asteroid.kill()
-                    score += 100
+            # Check for bullet collisions with asteroids
+            for asteroid in asteroids:
+                for shot in shots:
+                    if shot.check_collision(asteroid):
+                        asteroid.split()
+                        shot.kill()
+                        asteroid.kill()
+                        score += 100
 
-        # Draw all objects in the 'drawable' group
-        for obj in drawable:
-            obj.draw(screen)
+            # Draw all objects in the 'drawable' group
+            for obj in drawable:
+                obj.draw(screen)
 
-        score_text = font.render(f"Score: {score}", True, (255, 255, 255))  # White color
-        screen.blit(score_text, (10, 10))  # Display at the top-left corner
+            # Display score and lives
+            score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+            screen.blit(score_text, (10, 10))  # Top-left corner for score
+            lives_text = font.render(f'Lives: {player.lives}', True, (255, 255, 255))
+            screen.blit(lives_text, (SCREEN_WIDTH - 120, 10))  # Top-right corner for lives
+        else:
+            # Game over screen
+            screen.fill("black")  # Fill the screen with black
 
-        # Draw the lives on the screen
-        lives_text = font.render(f'Lives: {player.lives}', True, (255, 255, 255))
-        lives_rect = lives_text.get_rect(topright=(SCREEN_WIDTH - 10, 10))  # Position lives text at top-right corner
-        screen.blit(lives_text, lives_rect)         
+            # Display "Game Over" and score
+            game_over_text = font.render("Game Over", True, (255, 0, 0))
+            screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 50))
+            final_score_text = font.render(f"Final Score: {score}", True, (255, 255, 255))
+            screen.blit(final_score_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2))
+
+            # Check if 3 seconds have passed
+            if pygame.time.get_ticks() - game_over_timer > 3000:
+                running = False  # Exit the game after 3 seconds
+         
 
         pygame.display.flip()
         
